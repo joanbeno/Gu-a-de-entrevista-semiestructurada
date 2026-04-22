@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Entrevistas Campo</title>
+  <style>
+    :root {
+      --azul:  #000066;
+      --azulh: #0000aa;
+      --rojo:  #D22630;
+      --verde: #16a34a;
+      --am:    #d97706;
+      --fondo: #F8FAFC;
+      --blanco:#fff;
+      --gborde:#dde2f0;
+      --gclaro:#f0f2fa;
+      --txt:   #1A1A1A;
+      --txts:  #718096;
+      --s1: 0 1px 3px rgba(0,0,0,.06);
+      --s2: 0 4px 8px rgba(0,0,102,.10);
+    }
+
+    /* ---- RESET ---- */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { font-size: 15px; }
+    body {
+      font-family: Tahoma, sans-serif;
+      background: var(--fondo);
+      color: var(--txt);
+      min-height: 100vh;
+      max-width: 540px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ========== TOPBAR ========== */
+    .topbar {
+      position: fixed;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 540px;
+      background: var(--azul);
+      color: #fff;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 9px;
+      z-index: 200;
+      box-shadow: 0 2px 8px rgba(0,0,0,.35);
+    }
+    .tb-logo {
+      width: 30px; height: 30px; flex-shrink: 0;
+      background: #fff;
+      border-radius: 4px;
+      padding: 3px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tb-logo img { width:100%; height:100%; object-fit:contain; display:block; }
+    .tb-logo .tb-fb { font-size:13px; font-weight:700; color:var(--azul); line-height:1; }
+    .tb-info { flex:1; min-width:0; }
+    .tb-title { font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tb-sub   { font-size:9px; opacity:.65; letter-spacing:.3px; }
+    .tb-pill  {
+      display:none;
+      background:rgba(255,255,255,.18);
+      border-radius:20px;
+      padding:3px 9px;
+      font-size:10px; font-weight:700;
+      white-space:nowrap; flex-shrink:0;
+    }
+    .tb-back {
+      background:none; border:none; color:#fff;
+      font-size:19px; line-height:1; cursor:pointer;
+      padding:6px 4px; flex-shrink:0;
+    }
+
+    /* ========== MAIN ========== */
+    .main { padding-top: 50px; min-height: 100vh; }
+
+    /* ========== SCREENS ========== */
+    .screen { display:none; }
+    .screen.active { display:block; }
+
+    /* ========== SHARED COMPONENTS ========== */
+    .pad { padding: 18px 15px; }
+
+    .sec-title {
+      font-size: 11px; font-weight:700; color:var(--azul);
+      text-transform: uppercase; letter-spacing:.6px;
+      display:flex; align-items:center; gap:8px;
+      margin-bottom: 14px;
+    }
+    .sec-title::after { content:''; flex:1; height:2px; background:var(--gborde); border-radius:2px; }
+
+    label {
+      display:block;
+      font-size:11px; font-weight:700; color:var(--azul);
+      text-transform:uppercase; letter-spacing:.5px;
+      margin-bottom:5px;
+    }
+    label .opt-tag { font-weight:400; color:var(--txts); text-transform:none; letter-spacing:0; }
+
+    input[type=text], input[type=password], textarea, select {
+      width:100%;
+      padding:11px 13px;
+      border:1.5px solid var(--gborde);
+      border-radius:8px;
+      font-family:Tahoma, sans-serif;
+      font-size:14px;
+      color:var(--txt);
+      background:#fff;
+      transition:border-color .18s;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline:none; border-color:var(--azul);
+    }
+    textarea { resize:vertical; min-height:90px; line-height:1.5; }
+
+    .form-group { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+    .form-group:last-child { margin-bottom:0; }
+
+    .btn {
+      display:block; width:100%;
+      padding:13px 16px;
+      border:none; border-radius:8px;
+      font-family:Tahoma, sans-serif;
+      font-size:14px; font-weight:700;
+      cursor:pointer; text-align:center;
+      transition:opacity .15s, transform .1s;
+      line-height:1;
+    }
+    .btn:active { opacity:.82; transform:scale(.98); }
+    .btn-primary { background:var(--azul);  color:#fff; }
+    .btn-danger  { background:var(--rojo);  color:#fff; }
+    .btn-success { background:var(--verde); color:#fff; }
+    .btn-outline { background:#fff; color:var(--azul); border:2px solid var(--azul); }
+    .btn-ghost   { background:var(--gclaro); color:var(--txt); }
+    .btn-sm { padding:8px 13px; font-size:12px; border-radius:6px; width:auto; display:inline-block; }
+
+    .alert { padding:11px 13px; border-radius:8px; font-size:13px; line-height:1.4; }
+    .alert-error   { background:#fee2e2; color:#991b1b; border-left:3px solid var(--rojo); }
+    .alert-success { background:#dcfce7; color:#15803d; border-left:3px solid var(--verde); }
+    .alert-info    { background:#e0e7ff; color:#3730a3; border-left:3px solid #3730a3; }
+    .alert-warn    { background:#fef3c7; color:#92400e; border-left:3px solid var(--am); }
+
+    .badge {
+      display:inline-block; padding:2px 9px;
+      border-radius:20px; font-size:10px; font-weight:700; white-space:nowrap;
+    }
+    .badge-A       { background:#e0e7ff; color:#3730a3; }
+    .badge-B       { background:#fee2e2; color:#991b1b; }
+    .badge-buena   { background:#dcfce7; color:#15803d; }
+    .badge-parcial { background:#fef3c7; color:#92400e; }
+    .badge-limitada{ background:#fee2e2; color:#991b1b; }
+
+    /* ---- radio pills ---- */
+    .radio-group { display:flex; gap:7px; flex-wrap:wrap; }
+    .radio-opt { flex:1; min-width:72px; }
+    .radio-opt input { display:none; }
+    .radio-opt label {
+      display:block; padding:9px 6px;
+      background:#fff; border:1.5px solid var(--gborde);
+      border-radius:8px; text-align:center; cursor:pointer;
+      font-size:12px; font-weight:700; color:var(--txts);
+      text-transform:none; letter-spacing:0;
+      transition:all .15s;
+    }
+    .radio-opt input:checked + label {
+      border-color:var(--azul); background:var(--gclaro); color:var(--azul);
+    }
+
+    /* ========== LOGIN ========== */
+    #screen-login .login-wrap {
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      min-height:calc(100vh - 50px);
+      padding:24px 20px;
+    }
+    .login-card {
+      background:#fff; border-radius:12px;
+      padding:30px 22px; width:100%; max-width:320px;
+      box-shadow:var(--s2); border-top:4px solid var(--azul);
+    }
+    .login-card h2 { color:var(--azul); font-size:17px; margin-bottom:6px; text-align:center; }
+    .login-card .login-sub { font-size:12px; color:var(--txts); text-align:center; margin-bottom:22px; }
+
+    /* ========== HOME ========== */
+    .home-banner {
+      background:var(--azul); color:#fff;
+      padding:16px 15px; margin-bottom:16px;
+    }
+    .home-banner h3 { font-size:15px; margin-bottom:3px; }
+    .home-banner p  { font-size:11px; opacity:.75; }
+
+    .action-card {
+      background:#fff; border-radius:10px;
+      padding:15px 16px;
+      display:flex; align-items:center; gap:13px;
+      box-shadow:var(--s1); cursor:pointer;
+      border-left:4px solid var(--azul);
+      margin-bottom:10px;
+      transition:box-shadow .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .action-card:active { box-shadow:none; }
+    .action-card.red   { border-left-color:var(--rojo); }
+    .action-card.green { border-left-color:var(--verde); }
+    .action-card.gray  { border-left-color:var(--txts); }
+    .ac-icon { font-size:22px; flex-shrink:0; line-height:1; }
+    .ac-text h4 { font-size:13px; color:var(--azul); margin-bottom:2px; }
+    .ac-text p  { font-size:11px; color:var(--txts); }
+
+    /* ========== META / VERSION SELECT ========== */
+    .ver-cards { display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-bottom:20px; }
+    .ver-card {
+      background:#fff; border-radius:10px;
+      padding:16px 12px; text-align:center;
+      border:2px solid var(--gborde); cursor:pointer;
+      transition:all .18s; -webkit-tap-highlight-color:transparent;
+    }
+    .ver-card.selected { border-color:var(--azul); background:var(--gclaro); }
+    .ver-card .vl { font-size:30px; font-weight:700; color:var(--azul); line-height:1; margin-bottom:5px; }
+    .ver-card .vn { font-size:11px; color:var(--txts); line-height:1.3; }
+
+    /* ========== INTERVIEW ========== */
+    .blk-bar {
+      background:var(--azul); color:#fff;
+      padding:8px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .blk-name  { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; }
+    .blk-badge {
+      font-size:9px; background:rgba(255,255,255,.18);
+      padding:2px 8px; border-radius:20px; white-space:nowrap;
+    }
+
+    .prog-track { height:4px; background:var(--gborde); }
+    .prog-fill  { height:4px; background:var(--rojo); transition:width .3s ease; }
+
+    .q-card { padding:18px 15px 100px; }
+    .q-meta { font-size:10px; font-weight:700; color:var(--txts); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
+    .q-text { font-size:17px; font-weight:700; color:var(--txt); line-height:1.45; margin-bottom:14px; }
+
+    .q-followup {
+      background:#fffbeb; border-left:3px solid var(--am);
+      padding:9px 12px; border-radius:0 8px 8px 0;
+      margin-bottom:16px;
+    }
+    .q-followup-lbl { font-size:9px; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px; }
+    .q-followup-txt { font-size:12px; color:#78350f; line-height:1.4; }
+
+    .q-note-lbl { font-size:11px; font-weight:700; color:var(--azul); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+    .q-notes    { min-height:100px; }
+
+    .bottom-nav {
+      position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+      width:100%; max-width:540px;
+      background:#fff; border-top:1px solid var(--gborde);
+      padding:9px 14px; display:flex; gap:9px;
+      z-index:150; box-shadow:0 -2px 10px rgba(0,0,0,.08);
+    }
+    .bottom-nav .btn { flex:1; }
+
+    /* ========== CLOSING ========== */
+    .closing-wrap { padding:16px 15px 110px; }
+
+    .blk-vars {
+      background:#fff; border-radius:10px;
+      overflow:hidden; margin-bottom:13px;
+      box-shadow:var(--s1);
+    }
+    .blk-vars-hdr {
+      background:var(--gclaro); padding:9px 13px;
+      font-size:10px; font-weight:700; color:var(--azul);
+      text-transform:uppercase; letter-spacing:.5px;
+      border-bottom:1px solid var(--gborde);
+    }
+    .blk-vars-body { padding:13px; display:flex; flex-direction:column; gap:10px; }
+    .var-lbl { font-size:11px; color:var(--txts); font-weight:700; margin-bottom:3px; }
+    .var-inp { padding:8px 10px; font-size:13px; }
+
+    .rely-card {
+      background:#fff; border-radius:10px;
+      padding:14px 13px; margin-bottom:13px;
+      box-shadow:var(--s1);
+    }
+    .rely-title { font-size:11px; font-weight:700; color:var(--azul); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
+    .rely-opts  { display:flex; gap:7px; }
+    .rely-opt   { flex:1; }
+    .rely-opt input { display:none; }
+    .rely-opt label {
+      display:block; padding:10px 6px; border:2px solid var(--gborde);
+      border-radius:8px; text-align:center; cursor:pointer;
+      font-size:12px; font-weight:700; color:var(--txts);
+      text-transform:none; letter-spacing:0; transition:all .15s;
+    }
+    .rely-opt.good    input:checked + label { border-color:var(--verde); background:#dcfce7; color:#15803d; }
+    .rely-opt.partial input:checked + label { border-color:var(--am);    background:#fef3c7; color:#92400e; }
+    .rely-opt.limited input:checked + label { border-color:var(--rojo);  background:#fee2e2; color:#991b1b; }
+
+    .timer-chip {
+      display:inline-flex; align-items:center; gap:5px;
+      background:var(--gclaro); border-radius:20px;
+      padding:5px 11px; font-size:12px; color:var(--txts);
+      margin-bottom:14px;
+    }
+
+    /* ========== HISTORY ========== */
+    .int-card {
+      background:#fff; border-radius:10px;
+      padding:13px 14px; margin-bottom:10px;
+      box-shadow:var(--s1); border-left:4px solid var(--azul);
+    }
+    .int-card.vB { border-left-color:var(--rojo); }
+    .int-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:5px; }
+    .int-name { font-size:13px; font-weight:700; }
+    .int-badges { display:flex; gap:4px; flex-shrink:0; }
+    .int-meta { font-size:11px; color:var(--txts); margin-bottom:8px; }
+    .int-acts { display:flex; gap:7px; flex-wrap:wrap; }
+
+    /* ========== CONFIG ========== */
+    .config-wrap { padding:16px 15px; }
+    .config-section {
+      background:#fff; border-radius:10px;
+      padding:16px 14px; margin-bottom:14px;
+      box-shadow:var(--s1);
+    }
+    .config-section h4 { font-size:12px; font-weight:700; color:var(--azul); text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px; }
+
+    /* ========== MODAL ========== */
+    .modal-ov {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,.58); z-index:500;
+      overflow-y:auto; padding:16px 12px;
+    }
+    .modal-ov.active { display:block; }
+    .modal-box {
+      background:#fff; border-radius:12px;
+      max-width:520px; margin:0 auto; overflow:hidden;
+    }
+    .modal-hdr {
+      background:var(--azul); color:#fff;
+      padding:13px 15px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .modal-hdr h3 { font-size:13px; font-weight:700; }
+    .modal-close { background:none; border:none; color:#fff; font-size:22px; cursor:pointer; line-height:1; padding:0 2px; }
+    .modal-body  { padding:14px 15px; font-size:12px; color:var(--txts); line-height:1.5; }
+    .code-block  {
+      background:#0d0d1a; color:#a8c7fa;
+      padding:14px; font-family:monospace; font-size:10.5px;
+      line-height:1.65; overflow:auto; white-space:pre;
+      max-height:380px;
+    }
+    .modal-ftr { padding:12px 15px; display:flex; gap:8px; border-top:1px solid var(--gborde); }
+
+    /* ========== TOAST ========== */
+    .toast {
+      position:fixed; bottom:76px; left:50%; transform:translateX(-50%) translateY(10px);
+      max-width:300px; width:92%;
+      background:var(--txt); color:#fff;
+      padding:10px 15px; border-radius:8px;
+      font-size:13px; text-align:center;
+      z-index:600; opacity:0;
+      transition:opacity .28s, transform .28s;
+      pointer-events:none;
+    }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.ok  { background:var(--verde); }
+    .toast.err { background:var(--rojo); }
+    .toast.inf { background:#3730a3; }
+
+    /* ========== MISC ========== */
+    .divider { height:1px; background:var(--gborde); margin:14px 0; }
+    .mt10 { margin-top:10px; }
+    .mt14 { margin-top:14px; }
+    .empty-state { text-align:center; padding:36px 20px; color:var(--txts); font-size:13px; }
+    .stack { display:flex; flex-direction:column; gap:9px; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width:4px; height:4px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--gborde); border-radius:4px; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     TOP BAR
+============================================================ -->
+<header class="topbar" id="topbar">
+  <button class="tb-back" id="tbBack" onclick="handleBack()" style="display:none">&#8592;</button>
+  <div class="tb-logo">
+    <img src="Logo_u.png" alt="U"
+      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <span class="tb-fb" style="display:none">U</span>
+  </div>
+  <div class="tb-info">
+    <div class="tb-title" id="tbTitle">Entrevistas Campo</div>
+    <div class="tb-sub">Trabajo de Grado · Unicauca</div>
+  </div>
+  <div class="tb-pill" id="tbPill">0 hoy</div>
+</header>
+
+<main class="main">
+
+<!-- ============================================================
+     SCREEN: LOGIN
+============================================================ -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-card">
+      <h2>Acceso restringido</h2>
+      <p class="login-sub">Herramienta de registro de campo</p>
+      <div class="form-group">
+        <label for="loginPass">Contraseña</label>
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="loginErr" class="alert alert-error mt10" style="display:none">Contraseña incorrecta</div>
+      <div class="mt14">
+        <button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN: HOME
+============================================================ -->
+<div id="screen-home" class="screen">
+  <div class="home-banner">
+    <h3>Registro de entrevistas</h3>
+    <p id="homeDate">—</p>
+  </div>
+  <div class="pad" style="padding-top:4px;">
+    <div class="action-card" onclick="goTo('screen-meta')">
+      <div class="ac-icon">🎙️</div>
+      <div class="ac-text">
+        <h4>Nueva entrevista</h4>
+        <p>Seleccionar versión A o B y comenzar</p>
+      </div>
+    </div>
+    <div class="action-card green" onclick="goTo('screen-history')">
+      <div class="ac-icon">📋</div>
+      <div class="ac-text">
+        <h4>Historial de sesión</h4>
+        <p id="homeHistCount">Sin entrevistas aún</p>
+      </div>
+    </div>
+    <div class="action-card gray" onclick="goTo('screen-config')">
+      <div class="ac-icon">⚙️</div>
+      <div class="ac-text">
+        <h4>Configuración</h4>
+        <p>URL de Sheets · contraseña</p>
+      </div>
+    </div>
+    <div class="action-card red" onclick="showModal('modal-appsscript')">
+      <div class="ac-icon">📄</div>
+      <div class="ac-text">
+        <h4>Código Apps Script</h4>
+        <p>Para pegar en Google Sheets</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN: METADATA
+============================================================ -->
+<div id="screen-meta" class="screen">
+  <div class="pad">
+    <div class="sec-title">Versión de entrevista</div>
+    <div class="ver-cards">
+      <div class="ver-card" id="vcard-A" onclick="selectVer('A')">
+        <div class="vl">A</div>
+        <div class="vn">Clientes con experiencia directa</div>
+      </div>
+      <div class="ver-card" id="vcard-B" onclick="selectVer('B')">
+        <div class="vl">B</div>
+        <div class="vn">Talleres del sector</div>
+      </div>
+    </div>
+
+    <div class="sec-title">Datos del registro</div>
+
+    <div class="form-group">
+      <label>Fecha</label>
+      <input type="text" id="meta-fecha" readonly>
+    </div>
+    <div class="form-group">
+      <label>Tipo de establecimiento</label>
+      <select id="meta-tipo">
+        <option value="">— Seleccionar —</option>
+        <option>Taller metalmecánico</option>
+        <option>Taller de soldadura</option>
+        <option>Carpintería metálica</option>
+        <option>Empresa de construcción</option>
+        <option>Empresa de manufactura</option>
+        <option>Distribuidor de materiales</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Nombre / referencia <span class="opt-tag">(opcional)</span></label>
+      <input type="text" id="meta-nombre" placeholder="Ej: Taller El Progreso">
+    </div>
+    <div class="form-group">
+      <label>Forma de registro</label>
+      <div class="radio-group">
+        <div class="radio-opt">
+          <input type="radio" name="forma" id="forma-notas" value="Solo notas" checked>
+          <label for="forma-notas">Solo notas</label>
+        </div>
+        <div class="radio-opt">
+          <input type="radio" name="forma" id="forma-audio" value="Audio">
+          <label for="forma-audio">Audio</label>
+        </div>
+        <div class="radio-opt">
+          <input type="radio" name="forma" id="forma-mixto" value="Mixto">
+          <label for="forma-mixto">Mixto</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="metaErr" class="alert alert-error mt10" style="display:none">Seleccione una versión (A o B) para continuar.</div>
+
+    <div class="stack mt14">
+      <button class="btn btn-primary" onclick="startInterview()">Comenzar entrevista →</button>
+      <button class="btn btn-ghost" onclick="goTo('screen-home')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN: INTERVIEW
+============================================================ -->
+<div id="screen-interview" class="screen">
+  <div class="blk-bar">
+    <span class="blk-name" id="blkName">BLOQUE 0 — PERFIL</span>
+    <span class="blk-badge" id="blkBadge"></span>
+  </div>
+  <div class="prog-track">
+    <div class="prog-fill" id="progFill" style="width:0%"></div>
+  </div>
+  <div class="q-card">
+    <div class="q-meta" id="qMeta">Pregunta 1 de 30</div>
+    <div class="q-text" id="qText">…</div>
+    <div class="q-followup" id="qFollowup" style="display:none">
+      <div class="q-followup-lbl">Follow-up sugerido</div>
+      <div class="q-followup-txt" id="qFollowupTxt"></div>
+    </div>
+    <div class="q-note-lbl">Notas</div>
+    <textarea class="q-notes" id="qNotes" placeholder="Escribe aquí la respuesta o tus observaciones…"></textarea>
+  </div>
+  <div class="bottom-nav">
+    <button class="btn btn-outline" id="btnPrev" onclick="prevQ()">← Anterior</button>
+    <button class="btn btn-primary" id="btnNext" onclick="nextQ()">Siguiente →</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN: CLOSING
+============================================================ -->
+<div id="screen-closing" class="screen">
+  <div class="closing-wrap">
+
+    <div class="timer-chip" id="timerChip">⏱ — min</div>
+
+    <div class="sec-title">Variables extraídas por bloque</div>
+    <div id="varsContainer"></div>
+
+    <div class="rely-card">
+      <div class="rely-title">Confiabilidad de la entrevista</div>
+      <div class="rely-opts">
+        <div class="rely-opt good">
+          <input type="radio" name="rely" id="rely-buena" value="buena">
+          <label for="rely-buena">Buena</label>
+        </div>
+        <div class="rely-opt partial">
+          <input type="radio" name="rely" id="rely-parcial" value="parcial">
+          <label for="rely-parcial">Parcial</label>
+        </div>
+        <div class="rely-opt limited">
+          <input type="radio" name="rely" id="rely-limitada" value="limitada">
+          <label for="rely-limitada">Limitada</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="closingErr" class="alert alert-error" style="display:none">Seleccione la confiabilidad antes de guardar.</div>
+
+    <div class="stack">
+      <button class="btn btn-success" onclick="saveAndExport()">Guardar y exportar</button>
+      <button class="btn btn-outline" onclick="showModal('modal-appsscript')">Ver código Apps Script</button>
+      <button class="btn btn-ghost" onclick="goTo('screen-home')">Volver al inicio sin guardar</button>
+    </div>
+
+  </div>
+  <div class="bottom-nav" style="background:transparent;border:none;box-shadow:none;padding:0;"></div>
+</div>
+
+<!-- ============================================================
+     SCREEN: HISTORY
+============================================================ -->
+<div id="screen-history" class="screen">
+  <div class="pad">
+    <div class="sec-title">Historial de sesión</div>
+    <div id="histContainer">
+      <div class="empty-state">No hay entrevistas en esta sesión</div>
+    </div>
+    <div id="histBulkActs" class="stack mt14" style="display:none">
+      <button class="btn btn-success" onclick="exportAll()">Enviar todas a Google Sheets</button>
+      <button class="btn btn-outline" onclick="downloadAllJSON()">Descargar todas como JSON</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN: CONFIG
+============================================================ -->
+<div id="screen-config" class="screen">
+  <div class="config-wrap">
+
+    <div class="config-section">
+      <h4>Conexión Google Sheets</h4>
+      <div class="form-group">
+        <label>URL del Apps Script (endpoint)</label>
+        <input type="text" id="cfg-url" placeholder="https://script.google.com/macros/s/…/exec">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Nombre del archivo Sheets <span class="opt-tag">(referencia)</span></label>
+        <input type="text" id="cfg-sheetname" placeholder="Entrevistas_TG_2025">
+      </div>
+    </div>
+
+    <div class="config-section">
+      <h4>Seguridad</h4>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Nueva contraseña <span class="opt-tag">(dejar vacío para no cambiar)</span></label>
+        <input type="password" id="cfg-pass" placeholder="••••••••">
+      </div>
+    </div>
+
+    <div class="stack">
+      <button class="btn btn-primary" onclick="saveConfig()">Guardar configuración</button>
+      <button class="btn btn-ghost"   onclick="goTo('screen-home')">← Volver</button>
+    </div>
+    <div id="cfgMsg" class="alert mt10" style="display:none"></div>
+
+  </div>
+</div>
+
+</main><!-- /main -->
+
+<!-- ============================================================
+     TOAST
+============================================================ -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     MODAL: APPS SCRIPT
+============================================================ -->
+<div class="modal-ov" id="modal-appsscript">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3>Código Apps Script</h3>
+      <button class="modal-close" onclick="closeModal('modal-appsscript')">&#215;</button>
+    </div>
+    <div class="modal-body">
+      Abra su archivo de Google Sheets → <strong>Extensiones → Apps Script</strong>.<br>
+      Pegue este código, guarde, y publique como <strong>Aplicación web → Cualquier usuario</strong>.<br>
+      Copie la URL generada y péguela en Configuración.
+    </div>
+    <pre class="code-block" id="appsScriptCodeBlock"></pre>
+    <div class="modal-ftr">
+      <button class="btn btn-primary btn-sm" onclick="copyAppsScript()">Copiar código</button>
+      <button class="btn btn-ghost btn-sm"   onclick="closeModal('modal-appsscript')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: EXPORT RESULT
+============================================================ -->
+<div class="modal-ov" id="modal-export">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3>Exportación</h3>
+      <button class="modal-close" onclick="closeModal('modal-export')">&#215;</button>
+    </div>
+    <div class="modal-body" id="exportResultBody" style="font-size:13px;line-height:1.6;"></div>
+    <div class="modal-ftr">
+      <button class="btn btn-primary btn-sm" onclick="closeModal('modal-export'); goTo('screen-home')">Ir al inicio</button>
+      <button class="btn btn-ghost btn-sm"   onclick="closeModal('modal-export')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURACIÓN (se persiste en localStorage)
+// ============================================================
+const DEFAULTS = { pass: 'campo2024', url: '', sheetname: '' };
+
+let CFG = {
+  pass:      localStorage.getItem('ec_pass')      || DEFAULTS.pass,
+  url:       localStorage.getItem('ec_url')       || DEFAULTS.url,
+  sheetname: localStorage.getItem('ec_sheetname') || DEFAULTS.sheetname,
+};
+
+// ============================================================
+// PREGUNTAS — VERSIÓN A
+// ============================================================
+const VA = [
+  // BLOQUE 0
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P1',
+    text:'¿A qué se dedica principalmente el taller o empresa?', fu:null },
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P2',
+    text:'¿Qué tipo de trabajos realizan con más frecuencia?',
+    fu:'¿Qué materiales usan normalmente en esos trabajos?' },
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P3',
+    text:'¿Con cuántas personas cuentan aproximadamente?', fu:null },
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P4',
+    text:'¿Ustedes mismos hacen los cortes metálicos o suelen contratar ese proceso por fuera?', fu:null },
+
+  // BLOQUE 1
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P5',
+    text:'¿En qué tipo de trabajos necesitan corte de lámina o piezas metálicas?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P6',
+    text:'¿Con qué frecuencia se les presenta esa necesidad?',
+    fu:'¿Mensualmente cuántas veces aproximadamente? Si duda: ¿así sea un rango, por ejemplo 1–2 veces, 3–5…?' },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P7',
+    text:'Cuando necesitan corte, ¿es algo que ya estaba planeado o suele salir sobre la marcha?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P8',
+    text:'¿Qué pasa cuando les sale un trabajo urgente y no tienen cómo resolver el corte rápido?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P9',
+    text:'¿Qué dimensiones de piezas manejan normalmente? ¿Han tenido piezas que no les pudieron hacer por ser muy grandes?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P10',
+    text:'¿Han necesitado cortes en materiales gruesos, de varios centímetros de espesor? ¿Qué pasó cuando lo buscaron localmente?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P11',
+    text:'Hoy en día, cuando necesitan corte, ¿cómo lo resuelven?', fu:null },
+
+  // BLOQUE 2
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P13',
+    text:'Piense en la última vez que mandó a hacer un corte por fuera. ¿Qué trabajo era?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P14',
+    text:'¿A quién se lo encargó y por qué a ese proveedor?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P15',
+    text:'¿Cómo le fue con ese trabajo?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P16',
+    text:'¿Cuánto tiempo se demoró todo, desde que pidió el trabajo hasta que lo recibió?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P17',
+    text:'¿Cuánto le costó aproximadamente ese trabajo?',
+    fu:'¿Fue más cercano a [rango bajo] o a [rango alto]? No insistir si no quiere responder. Anotar siempre junto al precio: tipo de trabajo y tamaño aproximado.' },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P18',
+    text:'¿Hubo algún problema o algo que no saliera como esperaba?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P19',
+    text:'Cuando eso pasa, ¿cómo le afecta en su operación?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P20',
+    text:'¿Le ha tocado trabajar con proveedores fuera de Popayán? ¿Cómo le ha ido con eso?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P21',
+    text:'En general, ¿qué es lo que más le incomoda de trabajar con los proveedores de corte que tiene hoy?', fu:null },
+
+  // BLOQUE 3
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P23',
+    text:'Cuando usted eligió ese proveedor de corte, ¿qué fue lo que más pesó en esa decisión?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P24',
+    text:'¿Qué tendría que pasar para que cambiara de proveedor?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P25',
+    text:'Si tuviera que escoger entre un servicio más rápido y uno más económico, ¿cuál prefiere normalmente?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P26',
+    text:'En los casos en que ha usado un servicio con mayor capacidad técnica o de mayor formato, ¿qué diferencia ha notado frente a cuando lo resolvía de otra forma?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P27',
+    text:'¿En qué casos sí usaría un servicio local de este tipo y en cuáles no?',
+    fu:'¿Por ejemplo en qué tipo de trabajos?' },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P28',
+    text:'¿Qué sería innegociable para usted al contratar un servicio de corte?', fu:null },
+
+  // CIERRE
+  { blkId:4, blkName:'CIERRE', blkTime:null, n:'P29',
+    text:'¿Conoce a alguien más en el sector que trabaje con este tipo de cortes y que crea que me pueda dar su opinión?', fu:null },
+  { blkId:4, blkName:'CIERRE', blkTime:null, n:'P30',
+    text:'Si necesito aclarar algo después, ¿puedo volver a contactarlo?', fu:null },
+];
+
+// ============================================================
+// PREGUNTAS — VERSIÓN B
+// ============================================================
+const VB = [
+  // BLOQUE 0
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P1',
+    text:'¿A qué se dedica principalmente el taller o empresa?', fu:null },
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P2',
+    text:'¿Qué tipo de trabajos realizan con más frecuencia?',
+    fu:'¿Qué materiales usan normalmente en esos trabajos?' },
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P3',
+    text:'¿Con cuántas personas cuentan aproximadamente?', fu:null },
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P4',
+    text:'¿Ustedes mismos hacen los cortes metálicos o suelen contratar ese proceso por fuera?', fu:null },
+  { blkId:0, blkName:'BLOQUE 0 — PERFIL', blkTime:'máx 5 min', n:'P5',
+    text:'¿Prestan servicios de corte a otros o trabajan exclusivamente para producción propia?', fu:null },
+
+  // BLOQUE 1
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P6',
+    text:'¿En qué tipo de trabajos necesitan corte de lámina o piezas metálicas?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P7',
+    text:'¿Con qué frecuencia se les presenta esa necesidad?',
+    fu:'¿Mensualmente cuántas veces aproximadamente?' },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P8',
+    text:'Cuando necesitan corte, ¿es algo planeado o suele salir sobre la marcha?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P9',
+    text:'¿Qué pasa cuando les sale un trabajo urgente y no tienen cómo resolver el corte rápido?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P10',
+    text:'¿Qué dimensiones de piezas manejan normalmente? ¿Han tenido piezas que no les pudieron hacer por ser muy grandes?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P11',
+    text:'¿Han necesitado cortes en materiales gruesos? ¿Qué pasó cuando lo buscaron localmente?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P12',
+    text:'Hoy en día, cuando necesitan corte, ¿cómo lo resuelven?', fu:null },
+  { blkId:1, blkName:'BLOQUE 1 — DEMANDA Y NECESIDAD', blkTime:null, n:'P13',
+    text:'¿Qué trabajos de corte no pueden atender con su equipo actual? ¿Qué les piden los clientes que tienen que rechazar o mandar por fuera?', fu:null },
+
+  // BLOQUE 2
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P14',
+    text:'Piense en la última vez que mandó a hacer un corte por fuera. ¿Qué trabajo era?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P15',
+    text:'¿A quién se lo encargó y por qué a ese proveedor?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P16',
+    text:'¿Cómo le fue con ese trabajo?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P17',
+    text:'¿Cuánto tiempo se demoró todo, desde que pidió el trabajo hasta que lo recibió?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P18',
+    text:'¿Cuánto le costó aproximadamente ese trabajo?',
+    fu:'¿Fue más cercano a [rango bajo] o a [rango alto]? No insistir si no quiere responder. Anotar siempre junto al precio: tipo de trabajo y tamaño aproximado.' },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P19',
+    text:'¿Hubo algún problema o algo que no saliera como esperaba?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P20',
+    text:'Cuando eso pasa, ¿cómo le afecta en su operación?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P21',
+    text:'¿Le ha tocado trabajar con proveedores fuera de Popayán? ¿Cómo le ha ido con eso?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P22',
+    text:'En general, ¿qué es lo que más le incomoda de trabajar con los proveedores de corte que tiene hoy?', fu:null },
+  { blkId:2, blkName:'BLOQUE 2 — EXPERIENCIA CON LA OFERTA ACTUAL', blkTime:null, n:'P22b',
+    text:'Desde su lado como prestadores, ¿qué dificultades tienen para atender lo que les piden los clientes en materia de corte?', fu:null },
+
+  // BLOQUE 3
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P23',
+    text:'Cuando usted contrata corte por fuera, ¿qué es lo más importante al elegir proveedor?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P24',
+    text:'Si existiera en Popayán un proveedor con capacidad para hacer piezas de mayor formato o espesor que lo que hay hoy, ¿lo consideraría? ¿Por qué?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P25',
+    text:'¿Qué tendría que cumplir ese proveedor para que usted cambie del que usa hoy?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P26',
+    text:'Si tuviera que escoger entre un servicio más rápido y uno más económico, ¿cuál prefiere normalmente?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P27',
+    text:'¿Qué necesitaría mejorar usted para poder competir con proveedores más grandes o de otras ciudades?', fu:null },
+  { blkId:3, blkName:'BLOQUE 3 — DECISIÓN DE COMPRA Y VALORACIÓN', blkTime:null, n:'P28',
+    text:'¿Qué sería innegociable al contratar un servicio de corte?', fu:null },
+
+  // CIERRE
+  { blkId:4, blkName:'CIERRE', blkTime:null, n:'P29',
+    text:'¿Conoce a alguien más en el sector que trabaje con este tipo de cortes y que crea que me pueda dar su opinión?', fu:null },
+  { blkId:4, blkName:'CIERRE', blkTime:null, n:'P30',
+    text:'Si necesito aclarar algo después, ¿puedo volver a contactarlo?', fu:null },
+];
+
+// ============================================================
+// VARIABLES POR BLOQUE
+// ============================================================
+const VARS_BY_BLOCK = [
+  { blkId:0, blkName:'Bloque 0 — Perfil', vars:[
+    { id:'tipo_actor',   lbl:'Tipo de actor' },
+    { id:'tamano_aprox', lbl:'Tamaño aproximado' },
+    { id:'materiales',   lbl:'Materiales que trabaja' },
+    { id:'uso_corte',    lbl:'Uso de corte (interno / externo / mixto)' },
+  ]},
+  { blkId:1, blkName:'Bloque 1 — Demanda y Necesidad', vars:[
+    { id:'frecuencia',       lbl:'Frecuencia (veces/mes)' },
+    { id:'tipo_trabajos',    lbl:'Tipo de trabajos' },
+    { id:'urgencia',         lbl:'Urgencia (programado / urgente)' },
+    { id:'dimensiones',      lbl:'Dimensiones y espesores demandados' },
+    { id:'limitacion_local', lbl:'Limitación oferta local' },
+  ]},
+  { blkId:2, blkName:'Bloque 2 — Experiencia con la Oferta', vars:[
+    { id:'proveedor_actual',   lbl:'Proveedor actual (local / externo)' },
+    { id:'tiempo_entrega',     lbl:'Tiempo de entrega' },
+    { id:'precio_referencia',  lbl:'Precio de referencia' },
+    { id:'problema_principal', lbl:'Problema principal' },
+    { id:'impacto_fallas',     lbl:'Impacto de fallas' },
+  ]},
+  { blkId:3, blkName:'Bloque 3 — Decisión y Valoración', vars:[
+    { id:'criterio_decision',      lbl:'Criterio de decisión (precio/tiempo/calidad/cercanía)' },
+    { id:'disposicion_cambio',     lbl:'Disposición al cambio' },
+    { id:'condicion_innegociable', lbl:'Condición innegociable' },
+    { id:'sensibilidad_precio',    lbl:'Sensibilidad precio vs. tiempo' },
+  ]},
+  { blkId:4, blkName:'Cierre', vars:[
+    { id:'referidos',                lbl:'Referidos' },
+    { id:'disponibilidad_seguimiento', lbl:'Disponibilidad de seguimiento' },
+  ]},
+];
+
+// ============================================================
+// ESTADO DE APLICACIÓN
+// ============================================================
+let S = {
+  ver:       null,      // 'A' | 'B'
+  qs:        [],        // preguntas aplanadas de la versión activa
+  cur:       0,         // índice pregunta actual
+  notes:     {},        // { idx: 'texto' }
+  vars:      {},        // { blkId: { varId: 'valor' } }
+  meta:      {},        // metadata de la entrevista
+  startTs:   null,      // Date.now() al inicio
+  sessions:  [],        // entrevistas guardadas en esta sesión
+};
+
+// ============================================================
+// NAVEGACIÓN ENTRE PANTALLAS
+// ============================================================
+const BACK_MAP = {
+  'screen-meta':      'screen-home',
+  'screen-interview': 'screen-meta',
+  'screen-closing':   'screen-interview',
+  'screen-history':   'screen-home',
+  'screen-config':    'screen-home',
+};
+const TITLES = {
+  'screen-login':     'Entrevistas Campo',
+  'screen-home':      'Entrevistas Campo',
+  'screen-meta':      'Nueva entrevista',
+  'screen-interview': 'En curso',
+  'screen-closing':   'Cierre de entrevista',
+  'screen-history':   'Historial de sesión',
+  'screen-config':    'Configuración',
+};
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+
+  // topbar
+  document.getElementById('tbTitle').textContent = TITLES[id] || 'Entrevistas Campo';
+  const showBack = id !== 'screen-login' && id !== 'screen-home';
+  document.getElementById('tbBack').style.display = showBack ? 'block' : 'none';
+
+  if (id === 'screen-history') renderHistory();
+  if (id === 'screen-config')  loadConfig();
+  if (id === 'screen-home')    refreshHome();
+}
+
+function handleBack() {
+  const cur = document.querySelector('.screen.active')?.id;
+  const dest = BACK_MAP[cur];
+  if (dest) goTo(dest);
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogin() {
+  const v = document.getElementById('loginPass').value;
+  if (v === CFG.pass) {
+    document.getElementById('loginErr').style.display = 'none';
+    document.getElementById('loginPass').value = '';
+    goTo('screen-home');
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('loginPass').value = '';
+  }
+}
+
+// ============================================================
+// HOME
+// ============================================================
+function refreshHome() {
+  const now = new Date();
+  document.getElementById('homeDate').textContent = now.toLocaleDateString('es-CO', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric'
+  });
+  const n = S.sessions.length;
+  document.getElementById('homeHistCount').textContent =
+    n === 0 ? 'Sin entrevistas aún' : n + ' entrevista' + (n>1?'s':'') + ' en esta sesión';
+  const pill = document.getElementById('tbPill');
+  if (n > 0) { pill.style.display='block'; pill.textContent = n+' hoy'; }
+  else        { pill.style.display='none'; }
+}
+
+// ============================================================
+// METADATA
+// ============================================================
+document.getElementById('meta-fecha').value = new Date().toLocaleDateString('es-CO');
+
+function selectVer(v) {
+  S.ver = v;
+  document.getElementById('vcard-A').classList.toggle('selected', v==='A');
+  document.getElementById('vcard-B').classList.toggle('selected', v==='B');
+  document.getElementById('metaErr').style.display = 'none';
+}
+
+function startInterview() {
+  if (!S.ver) {
+    document.getElementById('metaErr').style.display = 'block';
+    return;
+  }
+  S.meta = {
+    version:            S.ver,
+    fecha:              document.getElementById('meta-fecha').value,
+    tipo_establecimiento: document.getElementById('meta-tipo').value || '—',
+    nombre:             document.getElementById('meta-nombre').value.trim() || '(sin nombre)',
+    forma_registro:     document.querySelector('input[name="forma"]:checked')?.value || 'Solo notas',
+  };
+  S.qs       = S.ver === 'A' ? VA : VB;
+  S.cur      = 0;
+  S.notes    = {};
+  S.vars     = {};
+  S.startTs  = Date.now();
+
+  goTo('screen-interview');
+  renderQ();
+}
+
+// ============================================================
+// ENTREVISTA
+// ============================================================
+function renderQ() {
+  const q     = S.qs[S.cur];
+  const total = S.qs.length;
+
+  document.getElementById('blkName').textContent  = q.blkName;
+  document.getElementById('blkBadge').textContent = q.blkTime || '';
+  document.getElementById('progFill').style.width = ((S.cur+1)/total*100).toFixed(1)+'%';
+  document.getElementById('qMeta').textContent    = q.n + ' — Pregunta ' + (S.cur+1) + ' de ' + total;
+  document.getElementById('qText').textContent    = q.text;
+
+  if (q.fu) {
+    document.getElementById('qFollowup').style.display = 'block';
+    document.getElementById('qFollowupTxt').textContent = q.fu;
+  } else {
+    document.getElementById('qFollowup').style.display = 'none';
+  }
+
+  document.getElementById('qNotes').value = S.notes[S.cur] || '';
+
+  document.getElementById('btnPrev').style.visibility = S.cur === 0 ? 'hidden' : 'visible';
+  document.getElementById('btnNext').textContent = S.cur === total-1 ? 'Finalizar ✓' : 'Siguiente →';
+}
+
+function saveNote() {
+  S.notes[S.cur] = document.getElementById('qNotes').value;
+}
+
+function nextQ() {
+  saveNote();
+  if (S.cur < S.qs.length - 1) {
+    S.cur++;
+    renderQ();
+    window.scrollTo(0,0);
+  } else {
+    openClosing();
+  }
+}
+
+function prevQ() {
+  saveNote();
+  if (S.cur > 0) { S.cur--; renderQ(); window.scrollTo(0,0); }
+}
+
+// ============================================================
+// CIERRE
+// ============================================================
+function openClosing() {
+  goTo('screen-closing');
+  const mins = Math.round((Date.now()-S.startTs)/60000);
+  document.getElementById('timerChip').textContent = '⏱ Duración aprox.: ' + mins + ' min';
+  renderVars();
+  // reset reliability
+  document.querySelectorAll('input[name="rely"]').forEach(r => r.checked=false);
+  document.getElementById('closingErr').style.display='none';
+}
+
+function renderVars() {
+  const container = document.getElementById('varsContainer');
+  container.innerHTML = '';
+  VARS_BY_BLOCK.forEach(blk => {
+    const wrap = document.createElement('div');
+    wrap.className = 'blk-vars';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'blk-vars-hdr';
+    hdr.textContent = blk.blkName;
+    wrap.appendChild(hdr);
+
+    const body = document.createElement('div');
+    body.className = 'blk-vars-body';
+
+    blk.vars.forEach(v => {
+      const g = document.createElement('div');
+      const lbl = document.createElement('div');
+      lbl.className = 'var-lbl';
+      lbl.textContent = v.lbl;
+
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'var-inp';
+      inp.placeholder = v.lbl;
+      inp.dataset.blk = blk.blkId;
+      inp.dataset.var = v.id;
+      // restore previously entered value
+      inp.value = (S.vars[blk.blkId] || {})[v.id] || '';
+      inp.addEventListener('input', () => {
+        if (!S.vars[blk.blkId]) S.vars[blk.blkId] = {};
+        S.vars[blk.blkId][v.id] = inp.value;
+      });
+
+      g.appendChild(lbl);
+      g.appendChild(inp);
+      body.appendChild(g);
+    });
+
+    wrap.appendChild(body);
+    container.appendChild(wrap);
+  });
+}
+
+function collectVars() {
+  document.querySelectorAll('[data-var]').forEach(inp => {
+    const b = inp.dataset.blk;
+    const v = inp.dataset.var;
+    if (!S.vars[b]) S.vars[b] = {};
+    S.vars[b][v] = inp.value;
+  });
+}
+
+// ============================================================
+// GUARDAR Y EXPORTAR
+// ============================================================
+function buildPayload() {
+  collectVars();
+  const rely    = document.querySelector('input[name="rely"]:checked')?.value || '';
+  const durMin  = Math.round((Date.now()-S.startTs)/60000);
+  const answers = S.qs.map((q,i) => ({
+    n:        q.n,
+    blkId:    q.blkId,
+    blkName:  q.blkName,
+    texto:    q.text,
+    notas:    S.notes[i] || '',
+  }));
+  return {
+    ...S.meta,
+    duracion_min:  durMin,
+    confiabilidad: rely,
+    variables:     S.vars,
+    respuestas:    answers,
+    timestamp:     new Date().toISOString(),
+    id:            Date.now(),
+  };
+}
+
+function saveAndExport() {
+  const rely = document.querySelector('input[name="rely"]:checked')?.value;
+  if (!rely) {
+    document.getElementById('closingErr').style.display = 'block';
+    return;
+  }
+  document.getElementById('closingErr').style.display = 'none';
+
+  const payload = buildPayload();
+  S.sessions.push(payload);
+  refreshHome();
+
+  // JSON download
+  dlJSON(payload, 'entrevista_V' + payload.version + '_' + payload.id + '.json');
+
+  // Sheets
+  if (CFG.url) {
+    sendSheets(payload, ok => {
+      showExportResult(ok, payload);
+    });
+  } else {
+    showExportResult('no-url', payload);
+  }
+}
+
+function showExportResult(status, p) {
+  let html = '<strong>Entrevista guardada.</strong><br><br>';
+  html += '<b>JSON:</b> descargado localmente.<br>';
+  if (status === true)     html += '<b>Sheets:</b> enviado correctamente ✓';
+  else if (status==='no-url') html += '<b>Sheets:</b> URL no configurada — configure en Ajustes y reenvíe desde el historial.';
+  else                     html += '<b>Sheets:</b> error al enviar — puede reintentarlo desde el historial.';
+  document.getElementById('exportResultBody').innerHTML = html;
+  showModal('modal-export');
+}
+
+function sendSheets(payload, cb) {
+  fetch(CFG.url, {
+    method: 'POST',
+    mode:   'no-cors',
+    headers:{ 'Content-Type':'application/json' },
+    body:    JSON.stringify(payload),
+  })
+  .then(() => { toast('Enviado a Sheets ✓','ok'); if(cb) cb(true); })
+  .catch(() => { toast('Error al enviar a Sheets','err'); if(cb) cb(false); });
+}
+
+function dlJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// HISTORIAL
+// ============================================================
+function renderHistory() {
+  const c = document.getElementById('histContainer');
+  const b = document.getElementById('histBulkActs');
+  if (S.sessions.length === 0) {
+    c.innerHTML = '<div class="empty-state">No hay entrevistas registradas en esta sesión.</div>';
+    b.style.display = 'none';
+    return;
+  }
+  b.style.display = 'flex';
+  c.innerHTML = '';
+  S.sessions.slice().reverse().forEach((s, ri) => {
+    const i = S.sessions.length - 1 - ri;
+    const card = document.createElement('div');
+    card.className = 'int-card v'+s.version;
+    const relyCls = s.confiabilidad === 'buena' ? 'badge-buena' : s.confiabilidad === 'parcial' ? 'badge-parcial' : 'badge-limitada';
+    const relyLbl = s.confiabilidad === 'buena' ? 'Buena' : s.confiabilidad === 'parcial' ? 'Parcial' : 'Limitada';
+    card.innerHTML =
+      '<div class="int-top">' +
+        '<div class="int-name">' + esc(s.nombre) + '</div>' +
+        '<div class="int-badges">' +
+          '<span class="badge badge-'+s.version+'">V. '+s.version+'</span>' +
+          '<span class="badge '+relyCls+'">'+relyLbl+'</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="int-meta">' + esc(s.tipo_establecimiento) + ' · ' + s.duracion_min + ' min · ' + esc(s.forma_registro) + ' · ' + fmtTs(s.timestamp) + '</div>' +
+      '<div class="int-acts">' +
+        '<button class="btn btn-outline btn-sm" onclick="dlJSON(S.sessions['+i+'],\'entrevista_'+i+'_'+s.id+'.json\')">⬇ JSON</button>' +
+        (CFG.url ? '<button class="btn btn-success btn-sm" onclick="sendSheets(S.sessions['+i+'], null); toast(\'Enviando…\',\'inf\')">→ Sheets</button>' : '') +
+      '</div>';
+    c.appendChild(card);
+  });
+}
+
+function exportAll() {
+  if (!CFG.url) { toast('Configure la URL de Sheets primero', 'err'); return; }
+  S.sessions.forEach(s => sendSheets(s, null));
+  toast('Enviando ' + S.sessions.length + ' entrevista(s)…', 'inf');
+}
+
+function downloadAllJSON() {
+  dlJSON({ sesion: new Date().toISOString(), entrevistas: S.sessions }, 'sesion_' + Date.now() + '.json');
+}
+
+// ============================================================
+// CONFIG
+// ============================================================
+function loadConfig() {
+  document.getElementById('cfg-url').value       = CFG.url;
+  document.getElementById('cfg-sheetname').value = CFG.sheetname;
+  document.getElementById('cfg-pass').value      = '';
+  document.getElementById('cfgMsg').style.display = 'none';
+}
+
+function saveConfig() {
+  const url  = document.getElementById('cfg-url').value.trim();
+  const name = document.getElementById('cfg-sheetname').value.trim();
+  const pass = document.getElementById('cfg-pass').value;
+
+  CFG.url = url; localStorage.setItem('ec_url', url);
+  CFG.sheetname = name; localStorage.setItem('ec_sheetname', name);
+  if (pass) { CFG.pass = pass; localStorage.setItem('ec_pass', pass); }
+
+  const msg = document.getElementById('cfgMsg');
+  msg.className = 'alert alert-success';
+  msg.textContent = 'Configuración guardada correctamente.';
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display='none', 2800);
+}
+
+// ============================================================
+// APPS SCRIPT CODE
+// ============================================================
+const APPS_SCRIPT = [
+'// ============================================================',
+'// APPS SCRIPT — Entrevistas de Campo (Trabajo de Grado)',
+'// 1. Abrir Google Sheets → Extensiones → Apps Script',
+'// 2. Pegar este código completo y guardar',
+'// 3. Implementar → Nueva implementación → Aplicación web',
+'//    Ejecutar como: Yo mismo | Acceso: Cualquier usuario',
+'// 4. Copiar la URL /exec y pegarla en Configuración del HTML',
+'// ============================================================',
+'',
+'function doPost(e) {',
+'  try {',
+'    var data = JSON.parse(e.postData.contents);',
+'    var ss   = SpreadsheetApp.getActiveSpreadsheet();',
+'    writeEntrevistas(ss, data);',
+'    writeRespuestas(ss, data);',
+'    writeMatriz(ss, data);',
+'    return ok({ ts: new Date().toISOString() });',
+'  } catch (err) {',
+'    return fail(err.toString());',
+'  }',
+'}',
+'',
+'function doGet(e) {',
+'  return ok({ status: "activo", ts: new Date().toISOString() });',
+'}',
+'',
+'// ---- Hoja: Entrevistas ----',
+'function writeEntrevistas(ss, d) {',
+'  var sh = getOrCreate(ss, "Entrevistas");',
+'  if (sh.getLastRow() === 0) {',
+'    var h = ["Timestamp","Versión","Fecha","Tipo Establecimiento",',
+'             "Nombre/Ref","Forma Registro","Duración (min)","Confiabilidad"];',
+'    sh.appendRow(h);',
+'    headerStyle(sh, h.length);',
+'  }',
+'  sh.appendRow([',
+'    d.timestamp, d.version, d.fecha,',
+'    d.tipo_establecimiento || "", d.nombre || "",',
+'    d.forma_registro || "", d.duracion_min || 0, d.confiabilidad || ""',
+'  ]);',
+'}',
+'',
+'// ---- Hoja: Respuestas Detalladas ----',
+'function writeRespuestas(ss, d) {',
+'  var sh = getOrCreate(ss, "Respuestas Detalladas");',
+'  if (sh.getLastRow() === 0) {',
+'    var h = ["Timestamp","Versión","Nombre/Ref","Bloque ID",',
+'             "Bloque Nombre","Pregunta","Texto pregunta","Notas"];',
+'    sh.appendRow(h);',
+'    headerStyle(sh, h.length);',
+'  }',
+'  (d.respuestas || []).forEach(function(r) {',
+'    sh.appendRow([',
+'      d.timestamp, d.version, d.nombre || "",',
+'      r.blkId, r.blkName, r.n, r.texto, r.notas || ""',
+'    ]);',
+'  });',
+'}',
+'',
+'// ---- Hoja: Matriz Variables ----',
+'function writeMatriz(ss, d) {',
+'  var sh = getOrCreate(ss, "Matriz Variables");',
+'  var headers = [',
+'    "Timestamp","Versión","Nombre/Ref","Confiabilidad",',
+'    "Tipo de actor","Tamaño aprox.","Materiales","Uso de corte",',
+'    "Frecuencia (v/mes)","Tipo de trabajos","Urgencia","Dimensiones/espesores","Limitación local",',
+'    "Proveedor actual","Tiempo entrega","Precio referencia","Problema principal","Impacto fallas",',
+'    "Criterio decisión","Disposición cambio","Condición innegociable","Sensibilidad precio/tiempo",',
+'    "Referidos","Disponibilidad seguimiento"',
+'  ];',
+'  if (sh.getLastRow() === 0) {',
+'    sh.appendRow(headers);',
+'    headerStyle(sh, headers.length);',
+'    sh.setFrozenRows(1);',
+'  }',
+'  var v  = d.variables || {};',
+'  var b0 = v["0"] || {};',
+'  var b1 = v["1"] || {};',
+'  var b2 = v["2"] || {};',
+'  var b3 = v["3"] || {};',
+'  var b4 = v["4"] || {};',
+'  sh.appendRow([',
+'    d.timestamp, d.version, d.nombre || "", d.confiabilidad || "",',
+'    b0.tipo_actor||"", b0.tamano_aprox||"", b0.materiales||"", b0.uso_corte||"",',
+'    b1.frecuencia||"", b1.tipo_trabajos||"", b1.urgencia||"", b1.dimensiones||"", b1.limitacion_local||"",',
+'    b2.proveedor_actual||"", b2.tiempo_entrega||"", b2.precio_referencia||"", b2.problema_principal||"", b2.impacto_fallas||"",',
+'    b3.criterio_decision||"", b3.disposicion_cambio||"", b3.condicion_innegociable||"", b3.sensibilidad_precio||"",',
+'    b4.referidos||"", b4.disponibilidad_seguimiento||""',
+'  ]);',
+'}',
+'',
+'// ---- Helpers ----',
+'function getOrCreate(ss, name) {',
+'  return ss.getSheetByName(name) || ss.insertSheet(name);',
+'}',
+'',
+'function headerStyle(sh, cols) {',
+'  sh.getRange(1, 1, 1, cols)',
+'    .setFontWeight("bold")',
+'    .setBackground("#000066")',
+'    .setFontColor("#FFFFFF");',
+'}',
+'',
+'function ok(data) {',
+'  return ContentService',
+'    .createTextOutput(JSON.stringify(Object.assign({ ok: true }, data)))',
+'    .setMimeType(ContentService.MimeType.JSON);',
+'}',
+'',
+'function fail(msg) {',
+'  return ContentService',
+'    .createTextOutput(JSON.stringify({ ok: false, error: msg }))',
+'    .setMimeType(ContentService.MimeType.JSON);',
+'}',
+].join('\n');
+
+document.getElementById('appsScriptCodeBlock').textContent = APPS_SCRIPT;
+
+function copyAppsScript() {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(APPS_SCRIPT)
+      .then(() => toast('Código copiado ✓','ok'))
+      .catch(() => toast('No se pudo copiar','err'));
+  } else {
+    toast('Copie el texto manualmente','inf');
+  }
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function showModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+
+// close on backdrop click
+document.querySelectorAll('.modal-ov').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) closeModal(m.id); });
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type||'') + ' show';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function fmtTs(ts) {
+  try { return new Date(ts).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}); }
+  catch(e){ return ''; }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+refreshHome();
+</script>
+</body>
+</html>
